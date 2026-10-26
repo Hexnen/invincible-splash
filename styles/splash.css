@@ -1,0 +1,95 @@
+/* Invincible Splash — warstwa splashy. Czcionka: rodzina "Comic" (KOMIKAH) deklarowana przez system invincible. */
+/* Żetony palety (były 29 powtórzeń literałów). Definiowane też na .ins-chat, bo znacznik na karcie czatu leży poza warstwą splasha.
+   Atrybuty SVG w splash.mjs nie przyjmują var(), więc tam te same trzy wartości zostają literałami. */
+#invincible-splash-layer, .ins-chat {
+  --ins-ink: #0a0a0f;       /* kontur i tło pod czarnym napisem */
+  --ins-yellow: #ffd23f;    /* akcent domyślny (słowo, plakietki) */
+  --ins-red: #c4182f;       /* plakietka stresu */
+}
+#invincible-splash-layer {
+  position: fixed; inset: 0; pointer-events: none;
+  z-index: 5000; /* nad oknami kart postaci i dialogami (okna ≈100), pod tooltipami (9999) i powiadomieniami */
+  /* obszar roboczy = okno bez otwartego paska bocznego (czat): splash nie nachodzi na karty czatu; --ins-right/--ins-cx ustawia stage.mjs */
+  clip-path: inset(0 var(--ins-right, 0px) 0 0);
+  --ins-font: 'Comic', 'Bangers', Impact, 'Arial Narrow', sans-serif;
+}
+.ins-stage {
+  --u: 1; position: fixed; left: var(--ins-cx, 50%); top: 40%; aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%); pointer-events: none; user-select: none;
+  font-family: var(--ins-font);
+}
+.ins-stage.on-token { aspect-ratio: 4 / 3; }
+/* przy tokenie: słowo nad głową (stage.mjs), plakietki po bokach, wstążka pod spodem — wszystko blisko tokena w środku sceny */
+.ins-stage.on-token .ins-odds { top: auto; bottom: 7%; max-width: 92%; }
+.ins-stage.on-token .ins-sixbadge { right: 3%; top: 37%; width: calc(var(--u) * 92px); height: calc(var(--u) * 92px); min-width: 56px; min-height: 56px; }
+.ins-stage.on-token .ins-badge { left: 2%; top: 38%; max-width: 30%; }   /* transform-origin narzuca #hud > * (top left); transform ustawia stage.mjs */
+
+/* pełny ekran: poświata na cały widok + promienie; scena większa i na środku */
+.ins-backdrop { position: fixed; inset: 0 var(--ins-right, 0px) 0 0; pointer-events: none; }
+.ins-fullrays { position: fixed; left: var(--ins-cx, 50%); top: 46%; width: 140vmax; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, var(--ray, rgba(255, 214, 90, .5)) 0 4deg, transparent 4deg 12deg);
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 4%, transparent 98%); mask-image: radial-gradient(circle closest-side, #000 4%, transparent 98%); }
+.ins-stage.full { top: 50%; }
+.ins-rays { position: absolute; left: 50%; top: 46%; width: 170%; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 214, 90, .5) 0 5deg, transparent 5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 8%, transparent 62%); mask-image: radial-gradient(circle, #000 8%, transparent 62%); }
+.ins-flash { position: absolute; left: 50%; top: 46%; width: 150%; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; opacity: 0;
+  background: radial-gradient(circle, #fff 0, rgba(255, 255, 255, .55) 28%, transparent 60%); }
+.ins-particle { position: absolute; width: 10px; height: 10px; background: var(--ins-yellow); pointer-events: none; }
+
+.ins-badge { position: absolute; left: 2%; top: 7%; max-width: 26%; min-width: 0; background: #1b0a10; color: #fff; border: 3px solid var(--ins-ink);
+  box-shadow: 3px 3px 0 var(--ins-ink), 0 0 0 2px var(--ins-red); padding: 3px 9px 4px; display: flex; flex-direction: column; gap: 3px; transform: rotate(-4deg); z-index: 5; }
+/* Breaking Point: jaśniejszy pierścień zamiast rozmytej neonowej poświaty (komiks tnie twardą krawędzią; jasność niesie sam pierścień #ff5a6a) */
+.ins-badge.hot { background: #5a0614; box-shadow: 3px 3px 0 var(--ins-ink), 0 0 0 2px #ff5a6a; }
+.ins-badge .bt { font-family: var(--ins-font); letter-spacing: .06em; font-size: max(13px, calc(var(--u) * 21px)); line-height: 1; color: #ff8a9a; }
+.ins-badge .pips { display: flex; flex-wrap: wrap; gap: 3px; }   /* wiele pipów zawija się, zamiast wylewać poza plakietkę */
+.ins-badge .pip { width: calc(var(--u) * 13px); height: calc(var(--u) * 13px); min-width: 9px; min-height: 9px; flex: 0 1 auto; border-radius: 50%; border: 2px solid #a8707c; background: transparent; }   /* pusty pip: #a8707c na #1b0a10 = 4.8:1 (było 2.1:1) */
+.ins-badge .pip.on { background: var(--ins-red); border-color: var(--ins-red); }
+.ins-badge.hot .pip.on { background: #ff5a6a; border-color: #ff5a6a; }   /* czerwień pipa na ciemnoczerwonym tle .hot miała 2.4:1 */
+.ins-badge .pip.new { background: var(--ins-yellow); border-color: #fff; rotate: 45deg; border-radius: 2px; }   /* nowy pip to romb: kształt, nie tylko kolor (poświata zdjęta: żółć i biała krawędź na ciemnym tle wystarczą) */
+.ins-badge .bc { font-family: var(--ins-font); letter-spacing: .05em; font-size: max(12px, calc(var(--u) * 15px)); line-height: 1.1; color: #fff; }
+
+.ins-splash { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); pointer-events: none; text-align: center; white-space: nowrap; }
+.ins-inner { position: relative; display: inline-block; --pm: 1; --pv: 1; --ph: 1;
+  padding: calc(var(--fs) * var(--u) * .3px * var(--pm) * var(--pv)) calc(var(--fs) * var(--u) * .75px * var(--pm) * var(--ph)); }
+.ins-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ins-word { position: relative; display: inline-block; font-family: var(--ins-font); font-size: calc(var(--fs) * var(--u) * 1px); line-height: 1; letter-spacing: .04em; }
+.ins-w-back { position: absolute; inset: 0; color: var(--ins-ink); -webkit-text-stroke: calc(var(--fs) * var(--u) * var(--sw, .17) * 1px) var(--ins-ink);
+  text-shadow: 0 calc(var(--fs) * var(--u) * .05px) 0 var(--ins-ink), 0 calc(var(--fs) * var(--u) * .1px) 0 var(--ins-ink), calc(var(--fs) * var(--u) * .05px) calc(var(--fs) * var(--u) * .1px) 0 var(--ins-ink); }
+.ins-w-front { position: relative; color: transparent; background: linear-gradient(180deg, var(--w1, var(--ins-yellow)), var(--w2, #ff7a1a)); -webkit-background-clip: text; background-clip: text; }
+.ins-word.plain .ins-w-front { background: none; color: var(--fill, #9a98a6); }
+.ins-word.plain .ins-w-back { -webkit-text-stroke-width: calc(var(--fs) * var(--u) * .1px); }
+
+.ins-sixbadge { position: absolute; right: 3%; top: 13%; width: calc(var(--u) * 112px); height: calc(var(--u) * 112px); min-width: 76px; min-height: 76px; display: grid; place-items: center; pointer-events: none; transform: rotate(8deg); }
+.ins-sixbadge svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ins-sixbadge .num { position: relative; font-family: var(--ins-font); font-size: max(28px, calc(var(--u) * 52px)); line-height: .95; padding-top: 4%; color: var(--ins-ink); text-align: center; }
+.ins-sixbadge.two .num { font-size: max(22px, calc(var(--u) * 40px)); }
+.ins-sixbadge .num small { display: block; font-size: max(11px, .27em); letter-spacing: .06em; }
+
+.ins-odds { position: absolute; left: 50%; top: 4%; max-width: 62%; display: flex; align-items: stretch; white-space: nowrap; pointer-events: none; font-family: var(--ins-font); letter-spacing: .05em; transform: translateX(-50%) rotate(-2deg); }
+.ins-odds.shift { left: 27%; max-width: 54%; transform: rotate(-2deg); }
+.ins-odds span { display: inline-block; white-space: nowrap; padding: 1px calc(var(--u) * 12px); font-size: max(12px, calc(var(--u) * 24px * var(--of, 1))); line-height: 1.25; border: 3px solid var(--ins-ink); box-shadow: 3px 3px 0 var(--ins-ink); }
+.ins-odds .ph { background: var(--oc, var(--ins-yellow)); color: var(--ins-ink); transform: skewX(-8deg); }
+.ins-odds .pill { background: var(--ins-ink); color: #fff; border-left: 0; margin-left: -3px; transform: skewX(-8deg); }
+.ins-label { position: relative; margin-top: calc(var(--fs) * var(--u) * -.08px); font-family: var(--ins-font); letter-spacing: .14em; color: #fff;
+  font-size: max(12px, calc(var(--fs) * var(--u) * .26px)); text-shadow: 0 1px 0 #000, 0 0 6px #000; }
+
+/* znacznik na karcie czatu: słowo i pigułka szansy sklejone jak wstążka na scenie (.ins-odds), pochylone razem (rotate na rodzicu,
+   skew na częściach), zamiast dwóch luźnych klocków. Cichszy niż wcześniej (1em, było 1.15em): obok bąbla wyniku, żółtego słowa
+   postaci i przycisku Push to czwarty krzykliwy element, a przy 312 px dłuższe słowo spychało pigułkę do osobnej linii.
+   Skład zostaje w jednej linii, dopóki się mieści; w razie potrzeby zawija się cała pigułka (nowrap), nie litery. */
+.ins-chat { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 0; margin: 2px 0 6px; font-family: 'Comic', Impact, sans-serif; letter-spacing: .05em; line-height: 1.1; pointer-events: none; transform: rotate(-1.5deg); transform-origin: left center; }
+.chat-message .message-content .ins-chat .w, .ins-chat .w { min-width: 0; padding: 1px 8px; background: var(--ins-c, var(--ins-yellow)); border: 2px solid var(--ins-ink); box-shadow: 2px 2px 0 var(--ins-ink); transform: skewX(-8deg); font-size: 1em; text-wrap: balance; }
+/* style systemu (.chat-message .message-content *:not(a):not(.roll) { color }) = 0,3,1 przegrywają z selektorami poniżej (0,4,0); kolor i tło
+   pary napis/tło niosą kontrast (>= 4.6:1), więc !important chroni je przed przyszłym restylem kart czatu przez inny moduł (np. sheet-plus
+   wyłącza własną regułę dziedziczenia koloru dla .ins-chat *, ale to nie jest gwarancją po stronie tego modułu) */
+.chat-message .message-content .ins-chat .w, .ins-chat .w { color: var(--ins-ink) !important; }
+.chat-message .message-content .ins-chat .o, .ins-chat .o { color: #fff !important; background: var(--ins-ink); }
+.ins-chat .o { margin-left: -2px; padding: 1px 8px 1px 10px; font-size: max(11px, .85em); white-space: nowrap; transform: skewX(-8deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ins-rays, .ins-flash, .ins-particle, .ins-fullrays { display: none; }   /* ustawienie modułu "Ruch" robi to samo w JS (brak tych węzłów) */
+}
+
+/* żywy komunikat dla czytników ekranu (stage.mjs announce): niewidoczny, ale odczytywany */
+.ins-sr-only { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }

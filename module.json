@@ -1,0 +1,54 @@
+{
+  "id": "invincible-splash",
+  "title": "Invincible: Comic Splash",
+  "description": "Comic-book splash words, rarity ribbon, sixes badge and stress badge after every Year Zero roll of the Invincible system. Unofficial fan module.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "santa"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/splash.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "pl",
+      "name": "Polski",
+      "path": "lang/pl.json"
+    }
+  ],
+  "relationships": {
+    "systems": [
+      {
+        "id": "invincible",
+        "type": "system",
+        "compatibility": {
+          "minimum": "2.1.8"
+        }
+      }
+    ],
+    "recommends": [
+      {
+        "id": "dice-so-nice",
+        "type": "module"
+      }
+    ]
+  },
+  "url": "https://github.com/Hexnen/invincible-splash",
+  "manifest": "https://github.com/Hexnen/invincible-splash/releases/latest/download/module.json",
+  "download": "https://github.com/Hexnen/invincible-splash/releases/download/v0.1.0/module.zip",
+  "bugs": "https://github.com/Hexnen/invincible-splash/issues"
+}
