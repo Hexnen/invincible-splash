@@ -1,9 +1,12 @@
 /* Czytnik rzutu: ChatMessage z YearZeroRoll (system invincible) -> płaski opis rzutu "rd".
    Nie zakłada niczego poza strukturą wyników kości (results[].indexPush / indexResult / active / discarded). */
 
+import { isLabel, hasLabelWord } from './sys-labels.mjs';
+
 const ATTRS = ['fighting', 'agility', 'strength', 'reason', 'intuition', 'presence'];
-const L = key => game.i18n.localize(key);
-const attrLabel = a => L(`INVINCIBLE.Actor.base.FIELDS.attributes.${a}.label`);
+/* Nazwy w rzucie (flavor, breakdown) to tekst zapisany w języku klienta, który rzucał: dopasowanie w każdym znanym języku
+   (sys-labels.mjs, kopia tabeli z invincible-plus-ultra), nigdy przez jedno localize(). */
+const attrKey = a => `INVINCIBLE.Actor.base.FIELDS.attributes.${a}.label`;
 
 /* Czy to rzut kośćmi bazowymi Year Zero z systemu invincible? */
 export function getYZRoll(message) {
@@ -17,16 +20,10 @@ export function getYZRoll(message) {
 /* Klasyfikacja akcji z danych dostępnych w dialogu rzutu albo (zapasowo) z gotowej wiadomości:
    attackType (slugfest/charge/shooting, tylko ataki), nazwa rzutu (flavor), nazwy z breakdown, atrybut. */
 export function classify({ attackType, flavor, names = [], attribute = null }) {
-  attribute = attribute ?? ATTRS.find(a => names[0] === attrLabel(a)) ?? null;
-  const wreck = names.includes(L('INVINCIBLE.Actor.base.FIELDS.derived.slugfest.wreckZoneBonus'));
-  const f = String(flavor ?? '').toLowerCase();
+  attribute = attribute ?? ATTRS.find(a => isLabel(names[0], attrKey(a))) ?? null;
+  const wreck = names.some(n => isLabel(n, 'INVINCIBLE.Actor.base.FIELDS.derived.slugfest.wreckZoneBonus'));
   /* cały wyraz (nie podciąg): "Roadblock" nie jest "Block", "Charged Beam" nie jest "Charge" */
-  const has = key => {
-    const t = L(key).toLowerCase();
-    if (!t || t === key.toLowerCase()) return false;
-    const esc = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return new RegExp('(^|[^\\p{L}\\p{N}])' + esc + '($|[^\\p{L}\\p{N}])', 'u').test(f);
-  };
+  const has = key => hasLabelWord(flavor, key);
   let action;
   if (attackType === 'charge' || attackType === 'shooting' || attackType === 'slugfest') action = attackType;   // jawny typ ataku z systemu
   else if (has('INVINCIBLE.Actor.base.FIELDS.derived.slugfest.charge')) action = 'charge';
