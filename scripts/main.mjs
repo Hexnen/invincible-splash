@@ -78,6 +78,9 @@ function onReady() {
 
 Hooks.once('init', registerSettings);
 Hooks.once('setup', () => { if (game.system.id === SYSTEM) wrapRollDialog(); });
+/* etykiety plakietek już po wczytaniu tłumaczeń, nie dopiero w ready: log czatu renderuje stare wiadomości PRZED hookiem ready,
+   więc ich plakietki wychodziły po angielsku ("1 IN 33 · PUSH") na polskim kliencie */
+Hooks.once('i18nInit', () => { if (game.system?.id === SYSTEM) applyLabels(); });
 Hooks.once('ready', onReady);
 /* ładowanie po starcie gry (podczas developmentu): uruchom to, co normalnie robią init/setup/ready */
 if (globalThis.game?.ready) { registerSettings(); wrapRollDialog(); onReady(); }
