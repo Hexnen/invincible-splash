@@ -77,7 +77,8 @@ function onReady() {
 }
 
 Hooks.once('init', registerSettings);
-Hooks.once('setup', () => { if (game.system.id === SYSTEM) wrapRollDialog(); });
+/* etykiety już w setup: pasek boczny (czat z historią i znacznikami .ins-chat) renderuje się przed ready */
+Hooks.once('setup', () => { if (game.system.id === SYSTEM) { applyLabels(); wrapRollDialog(); } });
 Hooks.once('ready', onReady);
 /* ładowanie po starcie gry (podczas developmentu): uruchom to, co normalnie robią init/setup/ready */
 if (globalThis.game?.ready) { registerSettings(); wrapRollDialog(); onReady(); }
