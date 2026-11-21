@@ -198,7 +198,7 @@ export function buildEvent(rd, opts) {
   const { rng, st, dryN = 8, k0Offset = 0 } = opts;
   const { p, failP } = rarity(rd);
   const fail = rd.sixes === 0;
-  const action = ACTIONS[rd.action] ? rd.action : 'generic';
+  const action = Object.hasOwn(ACTIONS, rd.action) ? rd.action : 'generic';   // hasOwn: "constructor" z obcych opcji rzutu nie przejdzie
   const last = (st && st.last) || {};
   const ev = {
     v: 1,
