@@ -268,7 +268,8 @@ Hooks.on('createChatMessage', async (message, options, userId) => {
 Hooks.on('updateChatMessage', async (message, changes, options, userId) => {
   try {
     if (game.system.id !== SYSTEM || !cs('enabled') || !changes.rolls) return;
-    if (userId !== game.user.id && !cs('others')) return;
+    /* "others" po autorze rzutu, nie po tym, kto kliknął Accept (MG może zaakceptować rzut gracza) */
+    if (message.author?.id !== game.user.id && !cs('others')) return;
     /* tylko rzuty, które ten klient widział na żywo (spóźniony gracz nie odtwarza starego stresu przy kolejnym update) */
     if (!visibleToMe(message) || !shown.has(message.id) || stressShown.has(message.id) || document.visibilityState === 'hidden') return;
     const rd = readRoll(message);
