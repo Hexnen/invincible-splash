@@ -87,9 +87,8 @@
 .chat-message .message-content .ins-chat .o, .ins-chat .o { color: #fff !important; background: var(--ins-ink); }
 .ins-chat .o { margin-left: -2px; padding: 1px 8px 1px 10px; font-size: max(11px, .85em); white-space: nowrap; transform: skewX(-8deg); }
 
-@media (prefers-reduced-motion: reduce) {
-  .ins-rays, .ins-flash, .ins-particle, .ins-fullrays { display: none; }   /* ustawienie modułu "Ruch" robi to samo w JS (brak tych węzłów) */
-}
+/* Bez @media (prefers-reduced-motion): ustawienie modułu "Ruch" = "Automatycznie" już w JS nie tworzy promieni, błysku ani cząstek
+   (S.isReduced()), a reguła CSS ukrywała je także przy "Zawsze animuj", czyli wbrew wyborowi użytkownika. */
 
 /* żywy komunikat dla czytników ekranu (stage.mjs announce): niewidoczny, ale odczytywany */
 .ins-sr-only { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
