@@ -134,6 +134,12 @@ function fadeExtrasEarly(ctl) {
 
 function endCtl(ctl, quick) {
   if (ctl.dead) return;
+  /* naturalny koniec odroczony, gdy do trwającej sceny dołączyła późna plakietka stresu (playStress) */
+  if (!quick && ctl.holdUntil && performance.now() < ctl.holdUntil - 20) {
+    const wait = ctl.holdUntil - performance.now();
+    ctl.later(() => endCtl(ctl, false), wait);
+    return;
+  }
   ctl.dead = true;
   ctl.timers.forEach(clearTimeout);
   if (active.get(ctl.key) === ctl) active.delete(ctl.key);
@@ -268,7 +274,7 @@ export function play(ev, o) {
       S.leaveSplash(s);
       Array.from(stage.querySelectorAll('.ins-odds,.ins-sixbadge')).forEach((n, i) => later(() => S.leaveSlide(n), 120 + i * 90));
     }, hold);
-    later(() => Array.from(stage.querySelectorAll('.ins-badge')).forEach(S.leaveSlide), hold + 1400);
+    later(() => Array.from(stage.querySelectorAll('.ins-badge:not(.late)')).forEach(S.leaveSlide), hold + 1400);   // .late = stres dołączony później (playStress), schodzi sam
     if (full) later(() => fadeExtrasEarly(ctl), hold + 300);   // słowo schodzi w hold (520 ms); tło znika zaraz za nim
     stage.appendChild(s); S.popIn(s, 1.05 + 0.55 * P, 5 + 9 * P, rnd); S.idle(s, P, rnd);
     if (o.fx) S.fxFor(stage, ev.tag ? Math.max(P, 0.32) : P, later, o.fx, full);
@@ -298,10 +304,13 @@ export function playStress(ev, o) {
   const existing = active.get(key);
   const joined = !!existing && !existing.dead;
   const ctl = joined ? existing : openStage(o);
-  const stage = ctl.el;
-  ctl.later(() => S.stressBadge(stage, ev.stress, o.resolve ? o.resolve() : null, ctl.later), 100);
-  ctl.later(() => Array.from(stage.querySelectorAll('.ins-badge')).forEach(S.leaveSlide), 3400 * (o.hold || 1));
-  if (!joined) ctl.later(() => endCtl(ctl, false), 4000 * (o.hold || 1));
+  const stage = ctl.el, holdK = o.hold || 1;
+  /* dołączona plakietka ma własny czas życia: zdejmujemy tylko ją (nie plakietki sceny), a koniec sceny czeka, aż zejdzie */
+  let badge = null;
+  ctl.later(() => { badge = S.stressBadge(stage, ev.stress, o.resolve ? o.resolve() : null, ctl.later); badge?.classList.add('late'); }, 100);
+  ctl.later(() => { if (badge) S.leaveSlide(badge); }, 3400 * holdK);
+  if (joined) ctl.holdUntil = Math.max(ctl.holdUntil || 0, performance.now() + 4000 * holdK);
+  else ctl.later(() => endCtl(ctl, false), 4000 * holdK);
   return ctl;
 }
 
