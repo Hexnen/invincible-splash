@@ -337,6 +337,6 @@ function preview(opts = {}) {
 async function resetState(actor) {
   actor ??= canvas?.tokens?.controlled?.[0]?.actor;
   if (!actor) return ui.notifications.warn('Select a token or pass an actor.');
-  await actor.update({ [`flags.${ID}.-=state`]: null });
+  await actor.unsetFlag(ID, 'state');   // v14: składnia "-=" jest przestarzała (ostrzeżenie zgodności)
   ui.notifications.info(`${ID}: state reset for ${actor.name}`);
 }
